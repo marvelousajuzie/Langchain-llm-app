@@ -1,4 +1,6 @@
 from langchain_openai import ChatOpenAI
+from langchain_core.prompts import PromptTemplate
+from langchain_core.output_parsers import StrOutputParser
 from dotenv import load_dotenv
 import os
 
@@ -12,11 +14,16 @@ def generate_pet_name():
         temperature=0.7,
     )
 
-    response = llm.invoke(
-        "I have a pet dog and I want a cool name for it, suggest 10 cool names."
+
+    prompt_template_name = PromptTemplate(
+        input_variables=['animal_type'],
+       template="I have a {animal_type} and I want a cool name for it, suggest 10 cool names."
     )
 
-    return response.content
+    chain = prompt_template_name | llm | StrOutputParser()
+
+    response = chain.invoke({"animal_type": "cats"})
+    return response
 
 
 if __name__ == "__main__":
